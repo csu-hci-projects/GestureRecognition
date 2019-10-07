@@ -41,7 +41,7 @@ The pre-trained gestures are:
 - NOTHING (i.e. when none of the above gestures are input)
 
 This application provides following functionalities:
-- Prediction: Which allows the app to guess the user's gesture against pretrained gestures. App can dump the prediction data to the console terminal or to a json file directly which can be used to plot real time prediction bar chart (you can use my other script - https://github.com/asingh33/LivePlot)
+- Prediction: Which allows the app to guess the user's gesture against pretrained gestures.
 - New Training: Which allows the user to retrain the NN model. User can change the model architecture or add/remove new gestures. This app has inbuilt options to allow the user to create new image samples of user defined gestures if required.
 - Visualization: Which allows the user to see feature maps of different NN layers for a given input gesture image. Interesting to see how NN works and learns things.
 
