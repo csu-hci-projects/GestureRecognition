@@ -1,25 +1,15 @@
-[![DOI](https://zenodo.org/badge/89872749.svg)](https://zenodo.org/badge/latestdoi/89872749)
-# CNNGestureRecognizer
-Gesture recognition via CNN neural network implemented in Keras + Theano + OpenCV
+# GestureRecognition
+
+The intent of this repository is to make use of gesture recognition as part of a 3D user interface, and evaluate the 3D user interface. The project builds on top the [CNN Gesture Recognizer](https://github.com/asingh33/CNNGestureRecognizer).
 
 
 Key Requirements:
-Python 3.6.1
-OpenCV 3.4.1
-Keras 2.0.2
-Tensorflow 1.2.1
-Theano 0.9.0
+- Python 3.6.1
+- OpenCV 3.4.1
+- Keras 2.0.2
+- Tensorflow 1.2.1
+- Theano 0.9.0
 
-Suggestion: Better to download Anaconda as it will take care of most of the other packages and easier to setup a virtual workspace to work with multiple versions of key packages like python, opencv etc.
-
-# New changes
-I have uploaded few more changes to this repo -
-- Project is Python3 compatible now.
-- Added TensorFlow support, as Theano's development has been stopped.
-- Added a new background subtraction filter, which is by far the best performing filter for this project
-- Added lots of performance improving changes. There is now literally no FPS drop when prediction mode is enabled
-- An in-app graph plotting has been added to observe the probability of the gesture predictions 
- 
 # Repo contents
 - **trackgesture.py** : The main script launcher. This file contains all the code for UI options and OpenCV code to capture camera contents. This script internally calls interfaces to gestureCNN.py.
 - **gestureCNN.py** : This script file holds all the CNN specific code to create CNN model, load the weight file (if model is pretrained), train the model using image samples present in **./imgfolder_b**, visualize the feature maps at different layers of NN (of pretrained model) for a given input image present in **./imgs** folder.
@@ -42,33 +32,29 @@ eg: With Tensorflow as backend
 > python trackgesture.py 
 ```
 
-We are setting KERAS_BACKEND to change backend to Theano, so in case you have already done it via Keras.json then no need to do that. But if you have Tensorflow set as default then this will be required.
-
 # Features
-This application comes with CNN model to recognize upto 5 pretrained gestures:
+The pre-trained gestures are:
 - OK
 - PEACE
 - STOP
 - PUNCH
-- NOTHING (ie when none of the above gestures are input)
+- NOTHING (i.e. when none of the above gestures are input)
 
 This application provides following functionalities:
-- Prediction : Which allows the app to guess the user's gesture against pretrained gestures. App can dump the prediction data to the console terminal or to a json file directly which can be used to plot real time prediction bar chart (you can use my other script - https://github.com/asingh33/LivePlot)
-- New Training : Which allows the user to retrain the NN model. User can change the model architecture or add/remove new gestures. This app has inbuilt options to allow the user to create new image samples of user defined gestures if required.
-- Visualization : Which allows the user to see feature maps of different NN layers for a given input gesture image. Interesting to see how NN works and learns things.
+- Prediction: Which allows the app to guess the user's gesture against pretrained gestures. App can dump the prediction data to the console terminal or to a json file directly which can be used to plot real time prediction bar chart (you can use my other script - https://github.com/asingh33/LivePlot)
+- New Training: Which allows the user to retrain the NN model. User can change the model architecture or add/remove new gestures. This app has inbuilt options to allow the user to create new image samples of user defined gestures if required.
+- Visualization: Which allows the user to see feature maps of different NN layers for a given input gesture image. Interesting to see how NN works and learns things.
 
 
 # Demo 
-Youtube link - https://www.youtube.com/watch?v=CMs5cn65YK8
-
-![](https://j.gifs.com/X6zwYm.gif)
+Youtube link - https://www.youtube.com/watch?v=Et6JcMyF7SU
 
 # Gesture Input
-I am using OpenCV for capturing the user's hand gestures. In order to simply things I am doing post processing on the captured images to highlight the contours & edges. Like applying binary threshold, blurring, gray scaling.
+OpenCV is being used for capturing the user's hand gestures. Post processing is being done on the captured images, such as binary thresholding, blurring, gray scaling, etc. to highlight the contours & edges.
 
-I have provided two modes of capturing:
-- Binary Mode : In here I first convert the image to grayscale, then apply a gaussian blur effect with adaptive threshold filter. This mode is useful when you have an empty background like a wall, whiteboard etc.
-- SkinMask Mode : In this mode, I first convert the input image to HSV and put range on the H,S,V values based on skin color range. Then apply errosion followed by dilation. Then gaussian blur to smoothen out the noises. Using this output as a mask on original input to mask out everything other than skin colored things. Finally I have grayscaled it. This mode is useful when there is good amount of light and you dont have empty background.
+There are two modes of capture:
+- Binary Mode: The image is converted to grayscale, then a gaussian blur effect with adaptive threshold filtering is applied. This mode is useful with an empty background like a wall, whiteboard etc.
+- SkinMask Mode: The input image is converted to HSV and a range is put on the H,S,V values based on skin color range. This is followed by applying errosion, followed by dilation. Then a gaussian blur to smoothen out the noise, and using that output as a mask on original input to mask out everything other than skin colored. The output is then grayscaled. This mode is useful when there is good amount of light and the background is not very empty.
 
 **Binary Mode processing**
 ```python
@@ -78,7 +64,7 @@ th3 = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_B
 ret, res = cv2.threshold(th3, minValue, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 ```
 
-![OK gesture in Binary mode](https://github.com/asingh33/CNNGestureRecognizer/blob/master/imgfolder_b/iiiok160.png)
+![OK gesture in Binary mode](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgfolder_b/iiiok160.png)
 
 
 **SkindMask Mode processing**
@@ -100,34 +86,11 @@ res = cv2.bitwise_and(roi, roi, mask = mask)
 # color to grayscale
 res = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 ```
-![OK gesture in SkinMask mode](https://github.com/asingh33/CNNGestureRecognizer/blob/master/imgfolder_b/iiok44.png)
+![OK gesture in SkinMask mode](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgfolder_b/iiok44.png)
 
 
-# CNN Model used
-The CNN I have used for this project is pretty common CNN model which can be found across various tutorials on CNN. Mostly I have seen it being used for Digit/Number classfication based on MNIST database.
-
-```python
-model = Sequential()
-model.add(Conv2D(nb_filters, (nb_conv, nb_conv),
-                    padding='valid',
-                    input_shape=(img_channels, img_rows, img_cols)))
-convout1 = Activation('relu')
-model.add(convout1)
-model.add(Conv2D(nb_filters, (nb_conv, nb_conv)))
-convout2 = Activation('relu')
-model.add(convout2)
-model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
-model.add(Dropout(0.5))
-
-model.add(Flatten())
-model.add(Dense(128))
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
-model.add(Dense(nb_classes))
-model.add(Activation('softmax'))
-```
-
-This model has following 12 layers -
+# CNN Model
+The CNN model used had the following 12 layers -
 ```
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
@@ -157,86 +120,18 @@ _________________________________________________________________
 activation_4 (Activation)    (None, 5)                 0         
 =================================================================
 ```
-Total params: 39,348,325.0
-Trainable params: 39,348,325.0
 
 # Training
-In version 1.0 of this project I had used 1204 images only for training. Predictions probability was ok but not satisfying. So in version 2.0 I increased the training image set to 4015 images i.e. 803 image samples per class. Also added an additional class 'Nothing' along with the previous 4 gesture classes.
-
-I have trained the model for 15 epochs.
+The existing model was trained using an image set of 4015 images i.e. 803 image samples per class, for 15 epochs.
 
 ![Training Accuracy Vs Validation Accuracy](https://github.com/asingh33/CNNGestureRecognizer/blob/master/ori_4015imgs_acc.png)
 
 ![Training Loss Vs Validation Loss](https://github.com/asingh33/CNNGestureRecognizer/blob/master/ori_4015imgs_loss.png)
 
+Attempting to re-train the model resulted in a weird macOS-specific bug at the end, which caused the program to hang before saving the model, thereby requiring a restart and erasing the freshly trained model.
 
-# Visualization
-CNN is good in detecting edges and thats why its useful for image classificaion kind of problems. In order to understand how the neural net is understanding the different gesture input its possible to visualize the layer feature map contents.
-
-After launching the main script choose option 3 for visualizing different or all layer for a given image (currently it takes images from ./imgs, so change it accordingly)
-```
-What would you like to do ?
-    1- Use pretrained model for gesture recognition & layer visualization
-    2- Train the model (you will require image samples for training under .\imgfolder)
-    3- Visualize feature maps of different layers of trained model
-    3
-Will load default weight file
-Image number 7
-Enter which layer to visualize -1
-(4015, 40000)
-Press any key
-samples_per_class -  803
-Total layers - 12
-Dumping filter data of layer1 - Activation
-Dumping filter data of layer2 - Conv2D
-Dumping filter data of layer3 - Activation
-Dumping filter data of layer4 - MaxPooling2D
-Dumping filter data of layer5 - Dropout
-Can't dump data of this layer6- Flatten
-Can't dump data of this layer7- Dense
-Can't dump data of this layer8- Activation
-Can't dump data of this layer9- Dropout
-Can't dump data of this layer10- Dense
-Can't dump data of this layer11- Activation
-Press any key to continue
-```
-
-To understand how its done in Keras, check visualizeLayer() in gestureCNN.py
-```python
-layer = model.layers[layerIndex]
-
-get_activations = K.function([model.layers[0].input, K.learning_phase()], [layer.output,])
-activations = get_activations([input_image, 0])[0]
-output_image = activations
-```
-Layer 4 visualization for PUNCH gesture
-![Layer 4 visualization for PUNCH gesture](https://github.com/asingh33/CNNGestureRecognizer/blob/master/img_4_layer4_MaxPooling2D.png)
-
-Layer 2 visualization for STOP gesture
-![Layer 2 visualization for STOP gesture](https://github.com/asingh33/CNNGestureRecognizer/blob/master/img_7_layer2_Conv2D.png)
-
+![The bug](https://github.com/ApoorvDP/GestureRecognition/blob/Current/macOS_bug.png)
 
 
 # Conclusion
-So where to go from here? Well I thought of testing out the responsiveness of NN predictions and games are good benchmark. On MAC I dont have any games installed but then this Chrome Browser Dino Jump game came handy. So I bound the 'Punch' gesture with jump action of the Dino character. Basically can work with any other gesture but felt Punch gesture is easy. Stop gesture was another candidate.
-
-Well here is how it turned out :)
-
-Watch full video - https://www.youtube.com/watch?v=lnFPvtCSsLA&t=49s
-
-![](https://j.gifs.com/58pxVx.gif)
-
-
-
-# In case you want to cite my work
-Abhishek Singh,”asingh33/CNNGestureRecognizer: CNNGestureRecognizer (Version 1.3.0)”, Zenodo. http://doi.org/10.5281/zenodo.1064825, Nov. 2017.  
-
-
-
-
-Dont forget to check out my other github project where I used this framework and applied SuperVised machine learning technique to train the Chrome Browser's TRex character :)
-https://github.com/asingh33/SupervisedChromeTrex
-Youtube link - https://youtu.be/ZZgvklkQrss
-
-![](https://j.gifs.com/DRg4mn.gif)
-
+As of now, the gesture recognition is currently flawed, and the model needs to be re-trained. Currently collaborating with the repository owner to work towards improving the gesture recognition.
