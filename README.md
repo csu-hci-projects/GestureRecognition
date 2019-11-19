@@ -1,6 +1,6 @@
 # GestureRecognition
 
-The intent of this repository is to make use of gesture recognition as part of a 3D user interface, and evaluate the 3D user interface. The project builds on top the [CNN Gesture Recognizer](https://github.com/asingh33/CNNGestureRecognizer).
+The intent of this repository is to make use of gesture recognition as part of a 3D user interface, and evaluate the 3D user interface. The project builds on top the [CNN Gesture Recognizer](https://github.com/asingh33/CNNGestureRecognizer). The game is developed using a [PyGame tutorial](https://www.youtube.com/watch?v=PjgLeP0G5Yw), and the images are downloaded from the [linked GitHub resource](https://github.com/techwithtim/Side-Scroller-Game/tree/master/images) in the tutorial.
 
 
 Key Requirements:
@@ -8,28 +8,29 @@ Key Requirements:
 - OpenCV 3.4.1
 - Keras 2.0.2
 - Tensorflow 1.2.1
-- Theano 0.9.0
+- PyGame 1.9.6
 
 # Repo contents
-- **trackgesture.py** : The main script launcher. This file contains all the code for UI options and OpenCV code to capture camera contents. This script internally calls interfaces to gestureCNN.py.
+- **experiment.py** : The main script launcher. This file contains all the code for UI options and OpenCV code to capture camera contents. This script internally calls interfaces to gestureCNN.py.
+- **Game.py**: The 2D side-scroller game, designed with the help of the aforementioned tutorial.
 - **gestureCNN.py** : This script file holds all the CNN specific code to create CNN model, load the weight file (if model is pretrained), train the model using image samples present in **./imgfolder_b**, visualize the feature maps at different layers of NN (of pretrained model) for a given input image present in **./imgs** folder.
 - **imgfolder_b** : This folder contains all the 4015 gesture images previously taken in order to train the model.
-- **_ori_4015imgs_weights.hdf5_** : This is pretrained file. GitHub does not allow files over 100MB; find the link to the actual file here - https://drive.google.com/open?id=0B6cMRAuImU69SHNCcXpkT3RpYkE
+- **_pretrained_weights_MacOS.hdf5_** : This is the pretrained file for MacOS. GitHub does not allow files over 100MB; find the link to the actual file here: https://drive.google.com/file/d/1j7K96Dkatz6q6zr5RsQv-t68B3ZOSfh0/view
+- **_pretrained_weights_WinOS.hdf5_** : This is the pretrained file for Windows. GitHub does not allow files over 100MB; find the link to the actual file here: https://drive.google.com/file/d/1PA7rJxHYQsW5IvcZAGeoZ-ExYSttFuGs/view
 - **_imgs_** - This is an optional folder of few sample images that one can use to visualize the feature maps at different layers. These are few sample images from imgfolder_b only.
 - **_ori_4015imgs_acc.png_** : This is just a pic of a plot depicting model accuracy Vs validation data accuracy for the pretrained model.
 - **_ori_4015imgs_loss.png_** : This is just a pic of a plot depicting model loss Vs validation loss for the pretrained model.
+- **_images_** : This is a repository for game resources, downloaded from linked GitHub resource.
+- **gesture.p**: Pickle file, used for linking gesture recognition to game actions in real-time.
+- **scores.txt**: Simple text file that stores all game scores till date.
 
 # Usage
 **On Mac**
 ```bash
-eg: With Theano as backend
-$ KERAS_BACKEND=theano python trackgesture.py 
+$ python experiment.py
 ```
-**On Windows**
-```bash
-eg: With Tensorflow as backend
-> set "KERAS_BACKEND=tensorflow"
-> python trackgesture.py 
+```another bash terminal
+$ python Game.py
 ```
 
 # Features
@@ -40,15 +41,10 @@ The pre-trained gestures are:
 - PUNCH
 - NOTHING (i.e. when none of the above gestures are input)
 
-This application provides following functionalities:
-
-- Prediction: Which allows the app to guess the user's gesture against pretrained gestures.
-- New Training: Which allows the user to retrain the NN model. User can change the model architecture or add/remove new gestures. This app has inbuilt options to allow the user to create new image samples of user defined gestures if required.
-- Visualization: Which allows the user to see feature maps of different NN layers for a given input gesture image. Interesting to see how NN works and learns things.
-
+The OK gesture is the least consistent, often getting confused with STOP. The gesture recognition requires outdoor light, or bright indoor light to work well.
 
 # Demo 
-Youtube link - https://www.youtube.com/watch?v=Et6JcMyF7SU
+(Latest) Youtube link - https://www.youtube.com/watch?v=251oXezktd8
 
 # Gesture Input
 OpenCV is being used for capturing the user's hand gestures. Post processing is being done on the captured images, such as binary thresholding, blurring, gray scaling, etc. to highlight the contours & edges.
@@ -129,9 +125,7 @@ The existing model was trained using an image set of 4015 images i.e. 803 image 
 
 ![Training Loss Vs Validation Loss](https://github.com/asingh33/CNNGestureRecognizer/blob/master/ori_4015imgs_loss.png)
 
-Attempting to re-train the model resulted in a weird macOS-specific bug at the end, which caused the program to hang before saving the model, thereby requiring a restart and erasing the freshly trained model.
-
-![The bug](https://github.com/ApoorvDP/GestureRecognition/blob/Current/macOS_bug.png)
+Worked with the author of the GestureRecognition repository to find out that weights were dependent on the operating system for some reason, hence pulled updated repo from upstream.
 
 
 # Conclusion

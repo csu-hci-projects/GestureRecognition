@@ -5,7 +5,6 @@ Created on Thu Mar  23 01:01:43 2017
 @author: abhisheksingh
 """
 
-#%%
 import cv2
 import numpy as np
 import os
@@ -13,7 +12,8 @@ import time
 
 import threading
 
-import gestureCNN as myNN
+import pickle
+import gestureCNN as gCNN
 
 minValue = 70
 
@@ -21,12 +21,11 @@ x0 = 400
 y0 = 200
 height = 200
 width = 200
+flag = 0
 
 saveImg = False
 guessGesture = False
 visualize = False
-
-lastgesture = -1
 
 kernel = np.ones((15,15),np.uint8)
 kernel2 = np.ones((1,1),np.uint8)
@@ -44,15 +43,7 @@ gestname = ""
 path = ""
 mod = 0
 
-banner =  '''\nWhat would you like to do ?
-    1- Use pretrained model for gesture recognition & layer visualization
-    2- Train the model (you will require image samples for training under .\imgfolder)
-    3- Visualize feature maps of different layers of trained model
-    4- Exit	
-    '''
 
-
-#%%
 def saveROIImg(img):
     global counter, gestname, path, saveImg
     if counter > (numOfSamples - 1):
@@ -69,9 +60,8 @@ def saveROIImg(img):
     time.sleep(0.04 )
 
 
-#%%
 def skinMask(frame, x0, y0, width, height, framecount, plot):
-    global guessGesture, visualize, mod, lastgesture, saveImg
+    global guessGesture, visualize, mod, saveImg
     # HSV values
     low_range = np.array([0, 50, 80])
     upper_range = np.array([30, 200, 255])
@@ -100,20 +90,19 @@ def skinMask(frame, x0, y0, width, height, framecount, plot):
         saveROIImg(res)
     elif guessGesture == True and (framecount % 5) == 4:
         #res = cv2.UMat.get(res)
-        t = threading.Thread(target=myNN.guessGesture, args = [mod, res])
+        t = threading.Thread(target=gCNN.guessGesture, args = [mod, res])
         t.start()
     elif visualize == True:
         layer = int(input("Enter which layer to visualize "))
         cv2.waitKey(0)
-        myNN.visualizeLayers(mod, res, layer)
+        gCNN.visualizeLayers(mod, res, layer)
         visualize = False
     
     return res
 
 
-#%%
 def binaryMask(frame, x0, y0, width, height, framecount, plot ):
-    global guessGesture, visualize, mod, lastgesture, saveImg
+    global guessGesture, visualize, mod, saveImg
     
     cv2.rectangle(frame, (x0,y0),(x0+width,y0+height),(0,255,0),1)
     #roi = cv2.UMat(frame[y0:y0+height, x0:x0+width])
@@ -129,28 +118,26 @@ def binaryMask(frame, x0, y0, width, height, framecount, plot ):
         saveROIImg(res)
     elif guessGesture == True and (framecount % 5) == 4:
         #ores = cv2.UMat.get(res)
-        t = threading.Thread(target=myNN.guessGesture, args = [mod, res])
+        t = threading.Thread(target=gCNN.guessGesture, args = [mod, res])
         t.start()
     elif visualize == True:
         layer = int(input("Enter which layer to visualize "))
         cv2.waitKey(1)
-        myNN.visualizeLayers(mod, res, layer)
+        gCNN.visualizeLayers(mod, res, layer)
         visualize = False
 
     return res
 
-#%%
 # This is the new mask mode. It simply tries to remove the background content by taking a image of the 
 # background and subtracts it from the new frame contents of the ROI window.
 # So in order to use it correctly, keep the contents of ROI window stable and without your hand in it 
 # and then press 'x' key. If you can see the contents of ROI window all blank then it means you are
 # good to go for gesture prediction
 def bkgrndSubMask(frame, x0, y0, width, height, framecount, plot):
-    global guessGesture, takebkgrndSubMask, visualize, mod, bkgrnd, lastgesture, saveImg
+    global guessGesture, takebkgrndSubMask, visualize, mod, bkgrnd, saveImg
         
     cv2.rectangle(frame, (x0,y0),(x0+width,y0+height),(0,255,0),1)
     roi = frame[y0:y0+height, x0:x0+width]
-    #roi = cv2.UMat(frame[y0:y0+height, x0:x0+width])
     roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         
     #Take background image
@@ -173,15 +160,15 @@ def bkgrndSubMask(frame, x0, y0, width, height, framecount, plot):
     if saveImg == True:
         saveROIImg(res)
     elif guessGesture == True and (framecount % 5) == 4:
-        t = threading.Thread(target=myNN.guessGesture, args = [mod, res])
+        t = threading.Thread(target=gCNN.guessGesture, args = [mod, res])
         t.start()
         #t.join()
-        #myNN.update(plot)
+        #gCNN.update(plot)
         
     elif visualize == True:
         layer = int(input("Enter which layer to visualize "))
         cv2.waitKey(0)
-        myNN.visualizeLayers(mod, res, layer)
+        gCNN.visualizeLayers(mod, res, layer)
         visualize = False
     
     
@@ -189,9 +176,8 @@ def bkgrndSubMask(frame, x0, y0, width, height, framecount, plot):
 	
 	
 	
-#%%
 def Main():
-    global guessGesture, visualize, mod, binaryMode, bkgrndSubMode, mask, takebkgrndSubMask, x0, y0, width, height, saveImg, gestname, path
+    global guessGesture, visualize, mod, binaryMode, bkgrndSubMode, mask, takebkgrndSubMask, x0, y0, width, height, saveImg, gestname, path, flag
     quietMode = False
     
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -202,34 +188,8 @@ def Main():
 
         
     #Call CNN model loading callback
-    while True:
-        ans = int(input( banner))
-        if ans == 2:
-            mod = myNN.loadCNN(-1)
-            myNN.trainModel(mod)
-            input("Press any key to continue")
-            break
-        elif ans == 1:
-            print("Will load default weight file")
-            mod = myNN.loadCNN(0)
-            break
-        elif ans == 3:
-            if not mod:
-                w = int(input("Which weight file to load (0 or 1)"))
-                mod = myNN.loadCNN(w)
-            else:
-                print("Will load default weight file")
+    mod = gCNN.loadCNN()
             
-            img = int(input("Image number "))
-            layer = int(input("Enter which layer to visualize "))
-            myNN.visualizeLayers(mod, img, layer)
-            input("Press any key to continue")
-            continue
-        
-        else:
-            print("Get out of here!!!")
-            return 0
-        
     ## Grab camera input
     cap = cv2.VideoCapture(0)
     cv2.namedWindow('Original', cv2.WINDOW_NORMAL)
@@ -263,7 +223,7 @@ def Main():
             framecount = framecount + 1
             end  = time.time()
             timediff = (end - start)
-            if( timediff >= 1):
+            if(timediff >= 1):
                 #timediff = end - start
                 fps = 'FPS:%s' %(framecount)
                 start = time.time()
@@ -275,8 +235,6 @@ def Main():
         cv2.putText(frame,'x - Toggle Background Sub Mask',(fx,fy + 2*fh), font, size,(0,255,0),1,1)		
         cv2.putText(frame,'g - Toggle Prediction Mode',(fx,fy + 3*fh), font, size,(0,255,0),1,1)
         cv2.putText(frame,'q - Toggle Quiet Mode',(fx,fy + 4*fh), font, size,(0,255,0),1,1)
-        cv2.putText(frame,'n - To enter name of new gesture folder',(fx,fy + 5*fh), font, size,(0,255,0),1,1)
-        cv2.putText(frame,'s - To start capturing new gestures for training',(fx,fy + 6*fh), font, size,(0,255,0),1,1)
         cv2.putText(frame,'ESC - Exit',(fx,fy + 7*fh), font, size,(0,255,0),1,1)
         
         
@@ -288,10 +246,20 @@ def Main():
 
             if guessGesture == True:
                 plot = np.zeros((512,512,3), np.uint8)
-                plot = myNN.update(plot)
-            
-            cv2.imshow('Gesture Probability',plot)
-            #plot = np.zeros((512,512,3), np.uint8)
+                plot = gCNN.update(plot)
+
+            cv2.imshow('Gesture Probability', plot)
+            if gCNN.jsonarray:
+                gesture = max(gCNN.jsonarray, key=gCNN.jsonarray.get)
+                if gesture == 'PUNCH':
+                    flag = 1
+                elif gesture == 'STOP':
+                    flag = 2
+                elif gesture == 'NOTHING':
+                    flag = 0
+                else:
+                    flag = -1
+                pickle.dump(flag, open('gesture.p', 'wb'))
         
         ############## Keyboard inputs ##################
         key = cv2.waitKey(5) & 0xff
@@ -309,7 +277,7 @@ def Main():
             else:
                 print("SkinMask filter active")
         
-		## Use g key to start gesture predictions via CNN
+	## Use x key to use and refresh Background SubMask filter
         elif key == ord('x'):
             takebkgrndSubMask = True
             bkgrndSubMode = True
@@ -341,35 +309,13 @@ def Main():
             quietMode = not quietMode
             print("Quiet Mode - {}".format(quietMode))
 
-        ## Use s key to start/pause/resume taking snapshots
-        ## numOfSamples controls number of snapshots to be taken PER gesture
-        elif key == ord('s'):
-            saveImg = not saveImg
-            
-            if gestname != '':
-                saveImg = True
-            else:
-                print("Enter a gesture group name first, by pressing 'n'")
-                saveImg = False
-        
-        ## Use n key to enter gesture name
-        elif key == ord('n'):
-            gestname = input("Enter the gesture folder name: ")
-            try:
-                os.makedirs(gestname)
-            except OSError as e:
-                # if directory already present
-                if e.errno != 17:
-                    print('Some issue while creating the directory named -' + gestname)
-            
-            path = "./"+gestname+"/"
-        
         #elif key != 255:
         #    print key
 
     #Realse & destroy
     cap.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     Main()
