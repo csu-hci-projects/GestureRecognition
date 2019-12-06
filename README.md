@@ -29,12 +29,14 @@ Key Requirements:
 
 # Usage
 **On Mac**
-```bash
+```to use gesture recognition
 $ python recognition.py
-**OR**
-python recognize.py
 ```
-```another bash terminal
+**OR**
+```to use alternate gesture detection
+$ python recognize.py
+```
+```to run the game
 $ python Game.py
 ```
 
