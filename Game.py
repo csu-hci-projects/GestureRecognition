@@ -234,13 +234,26 @@ while run:
                 obstacles.append(spike(810, 0, 48, 310))
 
     if runner.falling == False:
-        f = pickle.load(open('gesture.p', 'rb'))
+        try:
+            f = pickle.load(open('gesture.p', 'rb'))
+        except EOFError as e:
+            f = 0
 
         if f == 1:
             if not(runner.jumping):
                 runner.jumping = True
+        elif f == 2:
+            if not(runner.sliding):
+                runner.sliding = True
+        else:
+            pass
 
-        if f == 2:
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_UP]:
+            if not(runner.jumping):
+                runner.jumping = True
+        if keys[pygame.K_DOWN]:
             if not(runner.sliding):
                 runner.sliding = True
                 

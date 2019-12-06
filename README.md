@@ -1,6 +1,6 @@
 # GestureRecognition
 
-The intent of this repository is to make use of gesture recognition as part of a 3D user interface, and evaluate the 3D user interface. The project builds on top the [CNN Gesture Recognizer](https://github.com/asingh33/CNNGestureRecognizer). The game is developed using a [PyGame tutorial](https://www.youtube.com/watch?v=PjgLeP0G5Yw), and the images are downloaded from the [linked GitHub resource](https://github.com/techwithtim/Side-Scroller-Game/tree/master/images) in the tutorial.
+The intent of this repository is to make use of gesture recognition as part of a 3D user interface, and evaluate the 3D user interface. The project builds on top the [CNN Gesture Recognizer](https://github.com/asingh33/CNNGestureRecognizer). The game is developed using a [PyGame tutorial](https://www.youtube.com/watch?v=PjgLeP0G5Yw), and the images are downloaded from the [linked GitHub resource](https://github.com/techwithtim/Side-Scroller-Game/tree/master/images) in the tutorial. The alternate gesture system, is from another [gesture recognition repository](https://github.com/Gogul09/gesture-recognition). All codes were changed to use gestures recognized as inputs to the game. 
 
 
 Key Requirements:
@@ -9,9 +9,10 @@ Key Requirements:
 - Keras 2.0.2
 - Tensorflow 1.2.1
 - PyGame 1.9.6
+- imutils 0.5.3
 
 # Repo contents
-- **experiment.py** : The main script launcher. This file contains all the code for UI options and OpenCV code to capture camera contents. This script internally calls interfaces to gestureCNN.py.
+- **recognition.py** : The main script launcher for Gesture Recognition. This file contains all the code for UI options and OpenCV code to capture camera contents. This script internally calls interfaces to gestureCNN.py.
 - **Game.py**: The 2D side-scroller game, designed with the help of the aforementioned tutorial.
 - **gestureCNN.py** : This script file holds all the CNN specific code to create CNN model, load the weight file (if model is pretrained), train the model using image samples present in **./imgfolder_b**, visualize the feature maps at different layers of NN (of pretrained model) for a given input image present in **./imgs** folder.
 - **imgfolder_b** : This folder contains all the 4015 gesture images previously taken in order to train the model.
@@ -23,17 +24,22 @@ Key Requirements:
 - **_images_** : This is a repository for game resources, downloaded from linked GitHub resource.
 - **gesture.p**: Pickle file, used for linking gesture recognition to game actions in real-time.
 - **scores.txt**: Simple text file that stores all game scores till date.
+-**recognize.py**: Alternate gesture recognition script, focuses on segmentation to count the number of fingers, which are then fed as inputs to the game.
+-**resources**: This folder contains all resources necessary for _recognize.py_ to function.
 
 # Usage
 **On Mac**
 ```bash
-$ python experiment.py
+$ python recognition.py
+**OR**
+python recognize.py
 ```
 ```another bash terminal
 $ python Game.py
 ```
 
 # Features
+## recognition.py
 The pre-trained gestures are:
 - OK
 - PEACE
@@ -43,8 +49,11 @@ The pre-trained gestures are:
 
 The OK gesture is the least consistent, often getting confused with STOP. The gesture recognition requires outdoor light, or bright indoor light to work well.
 
+## recognize.py
+recognize.py simply counts the number of fingers being held up.
+
 # Demo 
-(Latest) Youtube link - https://www.youtube.com/watch?v=251oXezktd8
+(Latest) Youtube link - https://www.youtube.com/watch?v=EeSweL3aHC8
 
 # Gesture Input
 OpenCV is being used for capturing the user's hand gestures. Post processing is being done on the captured images, such as binary thresholding, blurring, gray scaling, etc. to highlight the contours & edges.

@@ -88,3 +88,4 @@ ENV/
 # Rope project settings
 .ropeproject
 pretrained_weights_MacOS.hdf5
+.DS_Store
