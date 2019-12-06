@@ -24,17 +24,21 @@ Key Requirements:
 - **_images_** : This is a repository for game resources, downloaded from linked GitHub resource.
 - **gesture.p**: Pickle file, used for linking gesture recognition to game actions in real-time.
 - **scores.txt**: Simple text file that stores all game scores till date.
--**recognize.py**: Alternate gesture recognition script, focuses on segmentation to count the number of fingers, which are then fed as inputs to the game.
--**resources**: This folder contains all resources necessary for _recognize.py_ to function.
+- **recognize.py**: Alternate gesture recognition script, focuses on segmentation to count the number of fingers, which are then fed as inputs to the game.
+- **resources**: This folder contains all resources necessary for _recognize.py_ to function.
 
 # Usage
 **On Mac**
-```bash
-$ python recognition.py
-**OR**
-python recognize.py
+To use gesture detection
 ```
-```another bash terminal
+$ python recognition.py
+```
+To use alternate gesture detection
+```
+$ python recognize.py
+```
+To run game
+```
 $ python Game.py
 ```
 
