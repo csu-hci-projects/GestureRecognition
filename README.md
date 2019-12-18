@@ -45,7 +45,7 @@ $ python Game.py
 # Features
 
 ## game
-![game.py](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgs/game.png)
+![game](https://github.com/csu-hci-projects/GestureRecognition/blob/master/imgs/game.png)
 
 ## recognition.py
 The pre-trained gestures are:
@@ -90,11 +90,11 @@ activation_4 (Activation)    (None, 5)                 0
 =================================================================
 ```
 
-![recognition.py](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgs/recognition.png)
-![prediction.py](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgs/prediction.png)
+![recognition.py](https://github.com/csu-hci-projects/GestureRecognition/blob/master/imgs/recognition.png)
+![prediction.py](https://github.com/csu-hci-projects/GestureRecognition/blob/master/imgs/prediction.png)
 
 ## recognize.py
-![recognize.py](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgs/recognize.png)
+![recognize.py](https://github.com/csu-hci-projects/GestureRecognition/blob/master/imgs/recognize.png)
 
 # Conclusion
 Both gesture detection approaches work well, and are used to feed input to the game.
