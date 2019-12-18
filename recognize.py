@@ -179,11 +179,11 @@ if __name__ == "__main__":
                 # show the thresholded image
                 cv2.imshow("Thesholded", thresholded)
 
-                if fingers == 2:
+                if fingers == 1:
                     flag = 1
-                elif fingers == 5:
+                elif fingers == 5 or fingers == 4:
                     flag = 2
-                elif fingers == 1:
+                elif fingers == 2:
                     flag = 0
                 else:
                     flag = -1

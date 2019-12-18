@@ -43,6 +43,10 @@ $ python Game.py
 ```
 
 # Features
+
+## game
+![game.py](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgs/game.png)
+
 ## recognition.py
 The pre-trained gestures are:
 - OK
@@ -53,53 +57,8 @@ The pre-trained gestures are:
 
 The OK gesture is the least consistent, often getting confused with STOP. The gesture recognition requires outdoor light, or bright indoor light to work well.
 
-## recognize.py
-recognize.py simply counts the number of fingers being held up.
-
-# Demo 
-(Latest) Youtube link - https://www.youtube.com/watch?v=EeSweL3aHC8
-
-# Gesture Input
 OpenCV is being used for capturing the user's hand gestures. Post processing is being done on the captured images, such as binary thresholding, blurring, gray scaling, etc. to highlight the contours & edges.
 
-There are two modes of capture:
-- Binary Mode: The image is converted to grayscale, then a gaussian blur effect with adaptive threshold filtering is applied. This mode is useful with an empty background like a wall, whiteboard etc.
-- SkinMask Mode: The input image is converted to HSV and a range is put on the H,S,V values based on skin color range. This is followed by applying errosion, followed by dilation. Then a gaussian blur to smoothen out the noise, and using that output as a mask on original input to mask out everything other than skin colored. The output is then grayscaled. This mode is useful when there is good amount of light and the background is not very empty.
-
-**Binary Mode processing**
-```python
-gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-blur = cv2.GaussianBlur(gray,(5,5),2)   
-th3 = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
-ret, res = cv2.threshold(th3, minValue, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-```
-
-![OK gesture in Binary mode](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgfolder_b/iiiok160.png)
-
-
-**SkindMask Mode processing**
-```python
-hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-    
-#Apply skin color range
-mask = cv2.inRange(hsv, low_range, upper_range)
-
-mask = cv2.erode(mask, skinkernel, iterations = 1)
-mask = cv2.dilate(mask, skinkernel, iterations = 1)
-
-#blur
-mask = cv2.GaussianBlur(mask, (15,15), 1)
-#cv2.imshow("Blur", mask)
-
-#bitwise and mask original frame
-res = cv2.bitwise_and(roi, roi, mask = mask)
-# color to grayscale
-res = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-```
-![OK gesture in SkinMask mode](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgfolder_b/iiok44.png)
-
-
-# CNN Model
 The CNN model used had the following 12 layers -
 ```
 _________________________________________________________________
@@ -131,15 +90,11 @@ activation_4 (Activation)    (None, 5)                 0
 =================================================================
 ```
 
-# Training
-The existing model was trained using an image set of 4015 images i.e. 803 image samples per class, for 15 epochs.
+![recognition.py](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgs/recognition.png)
+![prediction.py](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgs/prediction.png)
 
-![Training Accuracy Vs Validation Accuracy](https://github.com/asingh33/CNNGestureRecognizer/blob/master/ori_4015imgs_acc.png)
-
-![Training Loss Vs Validation Loss](https://github.com/asingh33/CNNGestureRecognizer/blob/master/ori_4015imgs_loss.png)
-
-Worked with the author of the GestureRecognition repository to find out that weights were dependent on the operating system for some reason, hence pulled updated repo from upstream.
-
+## recognize.py
+![recognize.py](https://github.com/ApoorvDP/GestureRecognition/blob/master/imgs/recognize.png)
 
 # Conclusion
-As of now, the gesture recognition is currently flawed, and the model needs to be re-trained. Currently collaborating with the repository owner to work towards improving the gesture recognition.
+Both gesture detection approaches work well, and are used to feed input to the game.
