@@ -98,4 +98,5 @@ activation_4 (Activation)    (None, 5)                 0
 
 # Conclusion
 Both gesture detection approaches work well, and are used to feed input to the game.
-[Demo](https://www.youtube.com/watch?v=T8GZPrZsqYU)
+
+**[Demo](https://www.youtube.com/watch?v=T8GZPrZsqYU)**
